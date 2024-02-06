@@ -4,7 +4,7 @@ def run_script(script_name):
     """Function to run a Python script and print its output."""
     try:
         # Run the script
-        completed_process = subprocess.run(['python', script_name], check=True, text=True, capture_output=True)
+        completed_process = subprocess.run(['python3', script_name], check=True, text=True, capture_output=True)
         # Print the standard output of the script
         print(f"Output of {script_name}:\n{completed_process.stdout}")
     except subprocess.CalledProcessError as e:
