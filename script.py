@@ -1,36 +1,63 @@
-import subprocess
+import json
+import openai
 import time
-import datetime
+from openai import OpenAI
+import os
 
-def run_script(script_name):
-    """Function to run a Python script and save its output to a txt file."""
-    try:
-        # Run the script
-        completed_process = subprocess.run(['python3', script_name], check=True, text=True, capture_output=True)
-        # Save the standard output of the script to a txt file
-        with open('script_outputs.txt', 'a') as file:  # Open the file in append mode
-            file.write(f"Output of {script_name}:\n{completed_process.stdout}\n")
-        print(f"Output of {script_name} saved to script_outputs.txt")
-    except subprocess.CalledProcessError as e:
-        # If the script returns a non-zero exit status, an error occurred.
-        with open('script_outputs.txt', 'a') as file:  # Open the file in append mode
-            file.write(f"Error running {script_name}:\n{e.output}\n")
-        print(f"Error running {script_name}:\n{e.output}")
+# Assuming you've set your OpenAI API key in the Lambda environment variables
+openai.api_key = os.environ["OPENAI_API_KEY"]
 
-if __name__ == "__main__":
-    # List of scripts to run
-    scripts = ['script.py', 'chunk.py', 'normal.py']
-    
-    while True:  # This creates an infinite loop to keep the script running
-        current_time = datetime.datetime.now()  # Get the current time
-        print(f"Running scripts at {current_time.strftime('%Y-%m-%d %H:%M:%S')}...")  # Print the current time in a readable format
-        
-        # Iterate over the list of scripts and run each one
-        for script in scripts:
-            print(f"Running {script}...")
-            run_script(script)
-            print(f"Finished running {script}.\n")
-        
-        print(f"Finished all scripts at {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
-        print("Waiting for one hour before the next run...\n")
-        time.sleep(3600)  # Wait for 3600 seconds (1 hour) before the next run
+client = OpenAI()
+
+# Function to create a run and check its status until completion
+def create_and_wait_for_run(thread_id, assistant_id):
+    start_time = time.time()  # Record the start time
+
+    thread_message = client.beta.threads.messages.create(
+      thread_id,
+      role="user",
+      content="""Hello doctor, I came here to talk about Cosentyx, do you have a few minutes""",
+    )
+
+    # Create the run
+    run = client.beta.threads.runs.create(
+        thread_id=thread_id,
+        assistant_id=assistant_id,
+        additional_instructions=" - Answer with 'Yes, I have a few minutes. What would you like to discuss about Cosentyx?'"
+    )
+    # print(f"Run created with ID: {run.id}")
+
+    # Check the run status in a loop
+    i=0
+    while True:
+        # Fetch the latest status of the run
+        run_status = client.beta.threads.runs.retrieve(
+          thread_id=thread_id,
+          run_id=run.id
+        )
+        if run_status.status == 'completed':
+            # print("Run completed!")
+            thread_messages = client.beta.threads.messages.list(thread_id)
+            # print(thread_messages.data)
+            break
+        elif run_status.status == 'failed':
+            # print("Run failed!")
+            break
+        else:
+            # i = i+1
+            continue
+            # print("Run is still processing...")
+            # time.sleep(5)  # Wait for 5 seconds before checking again
+
+    end_time = time.time()  # Record the end time
+    duration = end_time - start_time
+    print(f"Assistants run completed in {duration} seconds.")
+    # print(i)
+
+# Example usage
+thread = client.beta.threads.create()
+# thread_id = "thread_NGEVXzzgcOH2DoA9zptPTWnR"
+thread_id = thread.id
+# print(thread_id)
+assistant_id = "asst_xGgF26G4a7BDMGZsA84D1b4s"
+create_and_wait_for_run(thread_id, assistant_id)
