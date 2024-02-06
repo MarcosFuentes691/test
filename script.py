@@ -1,6 +1,7 @@
 import json
 import openai
 import time
+import os
 
 # Assuming you've set your OpenAI API key in the Lambda environment variables
 openai.api_key = os.environ["OPENAI_API_KEY"]
