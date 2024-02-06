@@ -1,4 +1,6 @@
 import subprocess
+import time
+import datetime
 
 def run_script(script_name):
     """Function to run a Python script and print its output."""
@@ -15,8 +17,16 @@ if __name__ == "__main__":
     # List of scripts to run
     scripts = ['script.py', 'chunk.py', 'normal.py']
     
-    # Iterate over the list of scripts and run each one
-    for script in scripts:
-        print(f"Running {script}...")
-        run_script(script)
-        print(f"Finished running {script}.\n")
+    while True:  # This creates an infinite loop to keep the script running
+        current_time = datetime.datetime.now()  # Get the current time
+        print(f"Running scripts at {current_time.strftime('%Y-%m-%d %H:%M:%S')}...")  # Print the current time in a readable format
+        
+        # Iterate over the list of scripts and run each one
+        for script in scripts:
+            print(f"Running {script}...")
+            run_script(script)
+            print(f"Finished running {script}.\n")
+        
+        print(f"Finished all scripts at {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+        print("Waiting for one hour before the next run...\n")
+        time.sleep(3600)  # Wait for 3600 seconds (1 hour) before the next run
