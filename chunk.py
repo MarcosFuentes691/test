@@ -29,8 +29,8 @@ completion = client.chat.completions.create(
   stream=True
 )
 
-//for chunk in completion:
-//  print(chunk.choices[0].delta)
+# for chunk in completion:
+#   print(chunk.choices[0].delta)
 
 end_time = time.time()  # Record the end time
 duration = end_time - start_time

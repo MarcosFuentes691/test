@@ -38,7 +38,7 @@ def create_and_wait_for_run(thread_id, assistant_id):
         if run_status.status == 'completed':
             # print("Run completed!")
             thread_messages = client.beta.threads.messages.list(thread_id)
-            //print(thread_messages.data)
+            # print(thread_messages.data)
             break
         elif run_status.status == 'failed':
             # print("Run failed!")
