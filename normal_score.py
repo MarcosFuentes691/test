@@ -5,7 +5,7 @@ client = OpenAI()
 start_time = time.time()  # Record the start time
 
 response = client.chat.completions.create(
-  model="ft:gpt-3.5-turbo-1106:quantified::8lIC93dz",
+  model="gpt-4-turbo-preview",
   messages=[
     {
       "role": "system",
@@ -19,7 +19,7 @@ response = client.chat.completions.create(
   presence_penalty=0
 )
 
-# print(response)
+print(response)
 
 end_time = time.time()  # Record the end time
 duration = end_time - start_time
