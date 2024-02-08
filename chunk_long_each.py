@@ -29,19 +29,34 @@ completion = client.chat.completions.create(
   stream=True
 )
 
-
-end_time = time.time()  # Record the end time
-duration = end_time - start_time
-print(f"Chunk Run completed in {duration} seconds.")
-
 collected_chunks = []
 collected_messages = []
 
-for chunk in completion:
+# Assuming 'completion' is a list of chunks
+for i, chunk in enumerate(completion):
+    if i % 25 == 0:  # Check if it's the start of a new group of 10
+        if i != 0:  # Avoid printing for the first chunk
+            end_time = time.time()  # Record the end time for the group
+            duration = end_time - group_start_time
+            print(f"Group of 25 chunks processed in {duration} seconds.")
+        group_start_time = time.time()  # Reset start time for the next group
+    
     collected_chunks.append(chunk)  # save the event response
     chunk_message = chunk.choices[0].delta.content  # extract the message
     collected_messages.append(chunk_message)  # save the message
 
+# After loop, check if there was a last group with less than 10 chunks
+if len(completion) % 25 != 0:
+    end_time = time.time()  # Record the end time for the last group
+    duration = end_time - group_start_time
+    print(f"Last group of chunks processed in {duration} seconds.")
+
+# Filter out None messages and concatenate
 collected_messages = [m for m in collected_messages if m is not None]
 full_reply_content = ''.join([m for m in collected_messages])
 print(f"Full conversation received: {full_reply_content}")
+
+# Finally, print the total duration
+total_end_time = time.time()
+total_duration = total_end_time - start_time
+print(f"Total Run completed in {total_duration} seconds.")
