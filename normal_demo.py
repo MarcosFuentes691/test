@@ -23,7 +23,7 @@ response = client.chat.completions.create(
   presence_penalty=0
 )
 
-# print(response)
+print(response)
 
 end_time = time.time()  # Record the end time
 duration = end_time - start_time
